@@ -5,50 +5,69 @@
 package Controller;
 import Model.Music;
 import Model.MusicLibrary;
-import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
+import java.util.Queue;
 import View.UserDashboardForm;
+import java.util.LinkedList;
+import javax.swing.table.DefaultTableModel;
+
+
 /**
  *
  * @author Anusha
  */
-public class LibraryController extends javax.swing.JFrame {
+public class ExploreController extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LibraryController.class.getName());
+    private static Queue<Music> exploreQueue = new LinkedList<>();
+    private static final ArrayList<Music> musicList = new ArrayList<>();
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ExploreController.class.getName());
 
     /**
-     * Creates new form LibraryController
+     * Creates new form ExploreController
      */
-    public LibraryController() {
+    public ExploreController() {
         initComponents();
-        loadSongsToTable();
+        loadExploreSongs();
     }
     
-    private void loadSongsToTable() {
-        ArrayList<Music> songs = MusicLibrary.getUserLibrary(); // only user library
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.setRowCount(0); // clear existing rows
-
-        int sn = 1;
-        for (Music song : songs) {
-            model.addRow(new Object[]{
-                sn++,
-                song.getTitle(),
-                song.getAlbum(),
-                song.getArtist(),
-                song.getYear(),
-                song.getGenre()
-            });
-        }
+    static {
+        musicList.add(new Music(1, "Honey", "Taylor Swift", "The Life of a Showgirl", "Pop", 2025));
+        musicList.add(new Music(2, "Intro", "Ariana Grande", "Eternal Sunshine", "Pop", 2024));
+        musicList.add(new Music(3, "Perfect", "Ed Sheeran", "Divide", "Romance", 2017));
+        musicList.add(new Music(4, "Believer", "Imagine Dragons", "Evolve", "Rock", 2018));
+        musicList.add(new Music(4, "Tears", "Sabrina Carpenter", "Mom's Best Friend", "Pop", 2025));
     }
 
+    // Static method to get explore songs
+    private void loadExploreSongs() {
+    // Ensure the table has the right model
+    DefaultTableModel model = new DefaultTableModel(
+        new Object[][] {},
+        new String[] { "S.N", "Title", "Album", "Artist", "Year", "Genre" }
+    );
+    jTable1.setModel(model);
+
+    ArrayList<Music> exploreSongs = MusicLibrary.getExploreSongs();
+    if (exploreSongs == null) exploreSongs = new ArrayList<>();
+
+    int sn = 1;
+    for (Music m : exploreSongs) {
+        model.addRow(new Object[]{
+            sn++, m.getTitle(), m.getAlbum(), m.getArtist(), m.getYear(), m.getGenre()
+        });
+    }
+}
 
     
     
-    // If you want to refresh table after adding new songs dynamically
-    public void refreshTable() {
-        loadSongsToTable();
-    }
+    public static Queue<Music> getExploreQueue() {
+    return exploreQueue;
+}
+    
+    public static void addExploreSong(Music m) {
+    exploreQueue.offer(m);
+}
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -60,13 +79,12 @@ public class LibraryController extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
@@ -74,13 +92,21 @@ public class LibraryController extends javax.swing.JFrame {
         getContentPane().setLayout(new java.awt.CardLayout());
 
         jPanel1.setBackground(new java.awt.Color(153, 153, 153));
-        jPanel1.setForeground(new java.awt.Color(153, 153, 153));
 
         jPanel2.setBackground(new java.awt.Color(0, 0, 0));
 
+        jButton1.setBackground(new java.awt.Color(153, 153, 153));
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
+        jButton1.setText("Home");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         jButton2.setBackground(new java.awt.Color(153, 153, 153));
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("Home");
+        jButton2.setText("Library");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -89,7 +115,7 @@ public class LibraryController extends javax.swing.JFrame {
 
         jButton3.setBackground(new java.awt.Color(153, 153, 153));
         jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("Library");
+        jButton3.setText("Explore");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -98,19 +124,10 @@ public class LibraryController extends javax.swing.JFrame {
 
         jButton4.setBackground(new java.awt.Color(153, 153, 153));
         jButton4.setForeground(new java.awt.Color(255, 255, 255));
-        jButton4.setText("Explore");
+        jButton4.setText("Log out");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
-            }
-        });
-
-        jButton5.setBackground(new java.awt.Color(153, 153, 153));
-        jButton5.setForeground(new java.awt.Color(255, 255, 255));
-        jButton5.setText("Log out");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
             }
         });
 
@@ -119,27 +136,26 @@ public class LibraryController extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jButton4)
-                        .addComponent(jButton3)
-                        .addComponent(jButton2)))
-                .addContainerGap(56, Short.MAX_VALUE))
+                .addGap(51, 51, 51)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3)
+                    .addComponent(jButton2)
+                    .addComponent(jButton1))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(96, 96, 96)
+                .addGap(112, 112, 112)
+                .addComponent(jButton1)
+                .addGap(39, 39, 39)
                 .addComponent(jButton2)
-                .addGap(60, 60, 60)
+                .addGap(98, 98, 98)
                 .addComponent(jButton3)
-                .addGap(30, 30, 30)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 188, Short.MAX_VALUE)
                 .addComponent(jButton4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 276, Short.MAX_VALUE)
-                .addComponent(jButton5)
-                .addGap(27, 27, 27))
+                .addGap(30, 30, 30))
         );
 
         jTextField1.setForeground(new java.awt.Color(204, 204, 204));
@@ -157,7 +173,7 @@ public class LibraryController extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 407, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(89, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -166,13 +182,6 @@ public class LibraryController extends javax.swing.JFrame {
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(19, Short.MAX_VALUE))
         );
-
-        jButton1.setText("Add song to the library");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -193,19 +202,13 @@ public class LibraryController extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addComponent(jButton1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 515, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 505, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -213,11 +216,9 @@ public class LibraryController extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1)
-                .addContainerGap())
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 456, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel1, "card2");
@@ -225,75 +226,26 @@ public class LibraryController extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-     String songName = javax.swing.JOptionPane.showInputDialog(
-        this,
-        "Enter song name:",
-        "Add Song",
-        javax.swing.JOptionPane.PLAIN_MESSAGE
-    );
-
-    if (songName == null || songName.trim().isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Song name cannot be empty!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
-    // Get song from master library
-    Music existingSong = MusicLibrary.getMusicByTitle(songName.trim());
-    if (existingSong == null) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Song not found in library!", "Not Found", javax.swing.JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-
-    // Add to user's library
-    MusicLibrary.addMusicToUserLibrary(existingSong);
-
-    // Refresh table to show the new song
-    loadSongsToTable();
-
-    javax.swing.JOptionPane.showMessageDialog(this, "Song added successfully!");
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-    String title = jTextField1.getText().trim();
-
-    Music found = MusicLibrary.getMusicByTitle(title);
-
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    model.setRowCount(0);
-
-    if (found != null) {
-        model.addRow(new Object[]{
-            1,
-            found.getTitle(),
-            found.getAlbum(),
-            found.getArtist(),
-            found.getYear(),
-            found.getGenre()
-        });
-
-        MusicLibrary.addToRecent(found); // STACK used here
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Song not found!");
-    }
+        // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         UserDashboardForm Home = new UserDashboardForm();
         Home.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        LibraryController library = new LibraryController();
+        library.setVisible(true);
+        
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        loadSongsToTable();
+        loadExploreSongs();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        ExploreController explore = new ExploreController(); // Open Explore page
-        explore.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_jButton4ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
         "Are you sure you want to logout?",
         "Confirm Logout",
@@ -307,7 +259,7 @@ public class LibraryController extends javax.swing.JFrame {
         // Close current dashboard
         this.dispose();
     }
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -331,7 +283,7 @@ public class LibraryController extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new LibraryController().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new ExploreController().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -339,7 +291,6 @@ public class LibraryController extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
