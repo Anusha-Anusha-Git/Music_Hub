@@ -4,47 +4,47 @@
  */
 package Model;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
+
 /**
  *
  * @author Anusha
  */
 public class MusicLibrary {
-    private ArrayList<Music> songList;
-    private Queue<Music> recentSongs;
+     private ArrayList<Music> musicList;
+     public MusicLibrary() {
+        musicList = new ArrayList<>();
+    }
 
-    public boolean addSong(Music song) {
-        // Check duplicate title
-        for (Music s : songList) {
-            if (s.getTitle().equalsIgnoreCase(song.getTitle())) {
-                return false; // duplicate title
+    // Add new music
+    public void addMusic(Music music) {
+        musicList.add(music);
+    }
+
+    // Update music by ID
+    public void updateMusic(int id, Music updatedMusic) {
+        for (int i = 0; i < musicList.size(); i++) {
+            if (musicList.get(i).getId() == id) {
+                musicList.set(i, updatedMusic);
+                return;
             }
         }
-        songList.add(song);
-
-        // add to recently added queue (max 5)
-        recentSongs.add(song);
-        if (recentSongs.size() > 5) {
-            recentSongs.poll();
-        }
-
-        return true;
     }
 
-    public ArrayList<Music> getAllSongs() {
-        return songList;
+    // Delete music by ID
+    public void deleteMusic(int id) {
+        musicList.removeIf(m -> m.getId() == id);
     }
-    
-    public void updateSong(int index, Music updatedSong) {
-        songList.set(index, updatedSong);
+
+    // Get all music
+    public ArrayList<Music> getAllMusic() {
+        return musicList;
     }
-    
-     public void deleteSong(int index) {
-        songList.remove(index);
+    public void sortByTitle() {
+        musicList.sort((m1, m2) -> m1.getTitle().compareToIgnoreCase(m2.getTitle()));
     }
-     
-    public Queue<Music> getRecentSongs() {
-        return recentSongs;
+
+    // Optional: Sort by year
+    public void sortByYear() {
+        musicList.sort((m1, m2) -> Integer.compare(m1.getYear(), m2.getYear()));
     }
 }
